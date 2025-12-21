@@ -1,8 +1,8 @@
+import InitialLayout from "@/components/InitialLayout";
 import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
 import { tokenCache } from "@clerk/clerk-expo/token-cache";
 import { ConvexReactClient } from "convex/react";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
-import { Stack } from "expo-router";
 import { FC, PropsWithChildren } from "react";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
@@ -33,7 +33,7 @@ const Providers: FC<PropsWithChildren> = ({ children }) => (
 export default function RootLayout() {
   return (
     <Providers>
-      <Stack screenOptions={{ headerShown: false }} />
+      <InitialLayout />
     </Providers>
   );
 }
