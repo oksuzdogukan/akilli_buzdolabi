@@ -5,7 +5,7 @@ import { Alert } from "react-native";
 export default function useCameraSystem() {
   const [permission, requestPermission] = useCameraPermissions();
   const [isCameraOpen, setIsCameraOpen] = useState(false);
-  const cameraRef = useRef<CameraView>(null);
+  const cameraRef = useRef<CameraView | null>(null);
 
   // Camera permission
   const handleCameraPermission = async () => {

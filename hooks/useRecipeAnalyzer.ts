@@ -11,7 +11,10 @@ export default function useRecipeAnalyzer() {
   const [loading, setLoading] = useState(false);
   const analyzeImage = useAction(api.gemini.analyzeImage); // gemini function from convex
 
-  const takePicture = async (cameraRef: RefObject<CameraView>) => {
+  const takePicture = async (
+    cameraRef: RefObject<CameraView | null>,
+    onSucces?: () => void
+  ) => {
     if (cameraRef.current) {
       if (!cameraRef.current) return;
 
@@ -43,6 +46,9 @@ export default function useRecipeAnalyzer() {
 
           // show results
           setRecipes(result.recipes as Recipe[]);
+
+          // for close camera
+          if (onSucces) onSucces();
         } else {
           console.log("optimize edilirken hata");
         }
