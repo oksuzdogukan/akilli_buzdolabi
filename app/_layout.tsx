@@ -24,7 +24,9 @@ const Providers: FC<PropsWithChildren> = ({ children }) => (
   <ClerkProvider tokenCache={tokenCache} publishableKey={publishableKey}>
     <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
       <SafeAreaProvider>
-        <SafeAreaView style={{ flex: 1 }}>{children}</SafeAreaView>
+        <SafeAreaView style={{ flex: 1, backgroundColor: "#000" }}>
+          {children}
+        </SafeAreaView>
       </SafeAreaProvider>
     </ConvexProviderWithClerk>
   </ClerkProvider>
