@@ -15,49 +15,47 @@ export default function useRecipeAnalyzer() {
     cameraRef: RefObject<CameraView | null>,
     onSucces?: () => void
   ) => {
-    if (cameraRef.current) {
-      if (!cameraRef.current) return;
+    if (!cameraRef.current) return;
 
-      try {
-        setLoading(true);
+    try {
+      setLoading(true);
 
-        // take picture
-        const photo = await cameraRef.current.takePictureAsync({
-          quality: 0.7,
-          base64: true,
+      // take picture
+      const photo = await cameraRef.current.takePictureAsync({
+        quality: 0.7,
+        base64: true,
+      });
+
+      if (!photo?.uri) {
+        throw new Error("Fotograf cekilemedi");
+      }
+
+      // optimize picture
+      const optimiziedPicture = await manipulateAsync(
+        photo.uri,
+        [{ resize: { width: 800 } }],
+        { compress: 0.6, format: SaveFormat.JPEG, base64: true }
+      );
+
+      // convex action, ask AI
+      if (optimiziedPicture.base64) {
+        const result = await analyzeImage({
+          imageBase64: optimiziedPicture.base64,
         });
 
-        if (!photo?.uri) {
-          throw new Error("Fotograf cekilemedi");
-        }
+        // show results
+        setRecipes(result.recipes as Recipe[]);
 
-        // optimize picture
-        const optimiziedPicture = await manipulateAsync(
-          photo.uri,
-          [{ resize: { width: 800 } }],
-          { compress: 0.6, format: SaveFormat.JPEG, base64: true }
-        );
-
-        // convex action, ask AI
-        if (optimiziedPicture.base64) {
-          const result = await analyzeImage({
-            imageBase64: optimiziedPicture.base64,
-          });
-
-          // show results
-          setRecipes(result.recipes as Recipe[]);
-
-          // for close camera
-          if (onSucces) onSucces();
-        } else {
-          console.log("optimize edilirken hata");
-        }
-      } catch (error) {
-        console.error(error);
-        Alert.alert("Tarif olusturulurken hata");
-      } finally {
-        setLoading(false);
+        // for close camera
+        if (onSucces) onSucces();
+      } else {
+        console.log("optimize edilirken hata");
       }
+    } catch (error) {
+      console.error(error);
+      Alert.alert("Tarif olusturulurken hata");
+    } finally {
+      setLoading(false);
     }
   };
 
