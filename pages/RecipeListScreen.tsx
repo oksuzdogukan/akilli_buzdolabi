@@ -12,69 +12,98 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function Favorites() {
-  const { favorites, toggleFavorite, isFavorite } = useFavorites();
+interface RecipeListScreenProps {
+  recipes: Recipe[];
+  detectedIngredients: string[];
+  onReset: () => void;
+}
+
+export default function RecipeListScreen({
+  recipes,
+  detectedIngredients,
+  onReset,
+}: RecipeListScreenProps) {
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
+  const { toggleFavorite, isFavorite } = useFavorites();
 
-  const renderRecipeItem = ({ item }: { item: any }) => {
-    const recipe = item.recipe as Recipe;
-    return (
-      <TouchableOpacity
-        style={styles.recipeCard}
-        onPress={() => setSelectedRecipe(recipe)}
-        activeOpacity={0.9}
-      >
-        <View style={styles.recipeHeader}>
-          <Text style={styles.recipeCategory}>{recipe.category}</Text>
-          <View style={styles.recipeMetaContainer}>
-            <Ionicons name="time-outline" size={14} color={COLORS.darkgray} />
-            <Text style={styles.recipeMetaText}>{recipe.prepTime}</Text>
-          </View>
+  const renderIngredient = ({ item }: { item: string }) => (
+    <View style={styles.ingredientChip}>
+      <Text style={styles.ingredientText}>{item}</Text>
+    </View>
+  );
+
+  const renderRecipeItem = ({ item }: { item: Recipe }) => (
+    <TouchableOpacity
+      style={styles.recipeCard}
+      onPress={() => setSelectedRecipe(item)}
+      activeOpacity={0.9}
+    >
+      <View style={styles.recipeHeader}>
+        <Text style={styles.recipeCategory}>{item.category}</Text>
+        <View style={styles.recipeMetaContainer}>
+          <Ionicons name="time-outline" size={14} color={COLORS.darkgray} />
+          <Text style={styles.recipeMetaText}>{item.prepTime}</Text>
+          <Text style={styles.recipeMetaDivider}>•</Text>
+          <Ionicons name="flame-outline" size={14} color={COLORS.darkgray} />
+          <Text style={styles.recipeMetaText}>{item.calories}</Text>
         </View>
-
-        <Text style={styles.recipeTitle}>{recipe.title}</Text>
-        <Text style={styles.recipeDescription} numberOfLines={2}>
-          {recipe.description}
-        </Text>
-
-        <TouchableOpacity
-          style={styles.removeButton}
-          onPress={(e) => {
-            e.stopPropagation();
-            toggleFavorite(recipe);
-          }}
-        >
-          <Ionicons name="heart" size={24} color={COLORS.primary} />
-        </TouchableOpacity>
-      </TouchableOpacity>
-    );
-  };
+      </View>
+      
+      <Text style={styles.recipeTitle}>{item.title}</Text>
+      <Text style={styles.recipeDescription} numberOfLines={2}>
+        {item.description}
+      </Text>
+      
+      <View style={styles.recipeFooter}>
+        <Text style={styles.viewRecipeText}>Tarifi Gör</Text>
+        <Ionicons
+          name="arrow-forward-circle"
+          size={24}
+          color={COLORS.primary}
+        />
+      </View>
+    </TouchableOpacity>
+  );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Favori Tariflerim</Text>
+        <TouchableOpacity onPress={onReset} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color={COLORS.secondary} />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Önerilen Tarifler</Text>
+        <View style={{ width: 24 }} />
       </View>
 
-      {favorites.length === 0 ? (
-        <View style={styles.emptyContainer}>
-          <Ionicons name="heart-dislike-outline" size={64} color={COLORS.lightgray} />
-          <Text style={styles.emptyText}>Henüz favori tarifiniz yok.</Text>
-          <Text style={styles.emptySubText}>
-            Beğendiğiniz tarifleri kalp ikonuna tıklayarak buraya ekleyebilirsiniz.
-          </Text>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {/* Detected Ingredients Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Tespit Edilen Malzemeler</Text>
+          <FlatList
+            data={detectedIngredients}
+            renderItem={renderIngredient}
+            keyExtractor={(item, index) => index.toString()}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.ingredientsList}
+          />
         </View>
-      ) : (
-        <FlatList
-          data={favorites}
-          renderItem={renderRecipeItem}
-          keyExtractor={(item) => item._id}
-          contentContainerStyle={styles.listContainer}
-        />
-      )}
+
+        {/* Recipes List */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Sizin İçin Seçtiklerimiz</Text>
+          <FlatList
+            data={recipes}
+            renderItem={renderRecipeItem}
+            keyExtractor={(item) => item.id.toString()}
+            scrollEnabled={false} // Since clear parent creates scroll
+          />
+        </View>
+        
+        <View style={{ height: 40 }} />
+      </ScrollView>
 
       {/* Recipe Detail Modal */}
       <Modal
@@ -95,13 +124,14 @@ export default function Favorites() {
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.favoriteButton}
-                  onPress={() => {
-                    toggleFavorite(selectedRecipe);
-                    setSelectedRecipe(null); // Close modal on remove? Optional.
-                  }}
+                  onPress={() => selectedRecipe && toggleFavorite(selectedRecipe)}
                 >
                   <Ionicons
-                    name="heart"
+                    name={
+                      selectedRecipe && isFavorite(selectedRecipe.id)
+                        ? "heart"
+                        : "heart-outline"
+                    }
                     size={24}
                     color={COLORS.primary}
                   />
@@ -110,7 +140,7 @@ export default function Favorites() {
 
               <Text style={styles.modalCategory}>{selectedRecipe.category}</Text>
               <Text style={styles.modalTitle}>{selectedRecipe.title}</Text>
-
+              
               <View style={styles.modalMetaRow}>
                 <View style={styles.modalMetaItem}>
                   <Ionicons name="time" size={20} color={COLORS.primary} />
@@ -145,13 +175,15 @@ export default function Favorites() {
                   </View>
                 ))}
               </View>
-
+              
               <View style={{ height: 40 }} />
             </ScrollView>
+            
+            {/* Fixed Bottom Action if needed */}
           </View>
         )}
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -159,67 +191,75 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
-    paddingTop: 20,
+    paddingTop: 50,
   },
   header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 20,
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-    backgroundColor: COLORS.background,
+    marginBottom: 20,
+  },
+  backButton: {
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: COLORS.light,
   },
   headerTitle: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: "bold",
     color: COLORS.secondary,
   },
-  listContainer: {
-    padding: 20,
-    gap: 15,
+  section: {
+    marginBottom: 25,
   },
-  emptyContainer: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 40,
-  },
-  emptyText: {
+  sectionTitle: {
     fontSize: 18,
-    fontWeight: "bold",
-    color: COLORS.darkgray,
-    marginTop: 20,
-    textAlign: "center",
+    fontWeight: "700",
+    color: COLORS.secondary,
+    marginLeft: 20,
+    marginBottom: 15,
   },
-  emptySubText: {
+  ingredientsList: {
+    paddingHorizontal: 20,
+    gap: 10,
+  },
+  ingredientChip: {
+    backgroundColor: COLORS.primary,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginRight: 8,
+  },
+  ingredientText: {
+    color: "#fff",
+    fontWeight: "600",
     fontSize: 14,
-    color: COLORS.lightgray,
-    marginTop: 10,
-    textAlign: "center",
-    lineHeight: 20,
   },
   recipeCard: {
     backgroundColor: "#fff",
     borderRadius: 16,
-    padding: 20, // Reduced padding
-    marginBottom: 10,
+    padding: 20,
+    marginHorizontal: 20,
+    marginBottom: 16,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
     elevation: 3,
-    position: "relative",
   },
   recipeHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 8,
+    marginBottom: 10,
   },
   recipeCategory: {
     fontSize: 12,
     fontWeight: "bold",
     color: COLORS.primary,
     textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
   recipeMetaContainer: {
     flexDirection: "row",
@@ -230,24 +270,34 @@ const styles = StyleSheet.create({
     color: COLORS.darkgray,
     marginLeft: 4,
   },
+  recipeMetaDivider: {
+    marginHorizontal: 6,
+    color: COLORS.lightgray,
+  },
   recipeTitle: {
     fontSize: 18,
     fontWeight: "bold",
     color: COLORS.secondary,
-    marginBottom: 6,
-    paddingRight: 40, // Space for heart button
+    marginBottom: 8,
   },
   recipeDescription: {
     fontSize: 14,
     color: COLORS.darkgray,
     lineHeight: 20,
+    marginBottom: 16,
   },
-  removeButton: {
-    position: "absolute",
-    top: 20,
-    right: 20,
+  recipeFooter: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    gap: 8,
   },
-  // Modal Styles (copied for consistency)
+  viewRecipeText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: COLORS.primary,
+  },
+  // Modal Styles
   modalContainer: {
     flex: 1,
     backgroundColor: "#fff",

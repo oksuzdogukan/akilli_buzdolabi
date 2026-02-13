@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as favorites from "../favorites.js";
 import type * as gemini from "../gemini.js";
 
 import type {
@@ -17,6 +18,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  favorites: typeof favorites;
   gemini: typeof gemini;
 }>;
 
