@@ -70,6 +70,7 @@ export const styles = StyleSheet.create({
   recipeMetaContainer: {
     flexDirection: "row",
     alignItems: "center",
+    marginRight: 30,
   },
   recipeMetaText: {
     fontSize: 12,
@@ -81,7 +82,7 @@ export const styles = StyleSheet.create({
     fontWeight: "bold",
     color: COLORS.secondary,
     marginBottom: 6,
-    paddingRight: 40, // Space for heart button
+    paddingRight: 50, // Space for heart button
   },
   recipeDescription: {
     fontSize: 14,

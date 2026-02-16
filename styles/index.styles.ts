@@ -1,7 +1,5 @@
 import { COLORS } from "@/constants/theme";
-import { Dimensions, StyleSheet } from "react-native";
-
-const { width, height } = Dimensions.get("window");
+import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   container: {
@@ -14,7 +12,6 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 40,
   },
   titleText: {
     fontSize: 22,
