@@ -1,27 +1,38 @@
+import LinkCommunityRecipeCard from "@/components/CommunityRecipeCard";
+import RecipeDetailModal from "@/components/RecipeDetailModal";
 import { COLORS } from "@/constants/theme";
-import useCameraSystem from "@/hooks/useCameraSystem";
-import useRecipeAnalyzer from "@/hooks/useRecipeAnalyzer";
+import usePublicRecipes from "@/hooks/usePublicRecipes";
 import { styles } from "@/styles/index.styles";
+import { Recipe } from "@/types/recipe";
 import { useUser } from "@clerk/clerk-expo";
 import { Ionicons } from "@expo/vector-icons";
-import React from "react";
+import React, { useState } from "react";
 import {
   ActivityIndicator,
+  FlatList,
   Image,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 
-export default function MainScreen() {
-  // call hooks
+interface MainScreenProps {
+  onOpenCamera: () => void;
+  onPickImage: () => void;
+  loading: boolean;
+}
+
+export default function MainScreen({
+  onOpenCamera,
+  onPickImage,
+  loading,
+}: MainScreenProps) {
   const { user } = useUser();
+  const { AllSharedRecipes } = usePublicRecipes();
+  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
 
-  const { loading, pickImage } = useRecipeAnalyzer();
-  const { handleCameraPermission } = useCameraSystem();
-
-  return (
-    <View style={styles.container}>
+  const renderHeader = () => (
+    <View>
       {/* HEADER*/}
       <View style={styles.headerContainer}>
         <Ionicons name="menu" size={24} color={COLORS.secondary} />
@@ -53,7 +64,7 @@ export default function MainScreen() {
         <View style={styles.buttonsSection}>
           <TouchableOpacity
             style={[styles.actionButtonMain, loading && { opacity: 0.7 }]}
-            onPress={handleCameraPermission}
+            onPress={onOpenCamera}
             disabled={loading}
           >
             {loading ? (
@@ -70,7 +81,7 @@ export default function MainScreen() {
 
           <TouchableOpacity
             style={[styles.actionButtonSecondary, loading && { opacity: 0.7 }]}
-            onPress={pickImage}
+            onPress={onPickImage}
             disabled={loading}
           >
             <Ionicons name="images" size={24} color={COLORS.primary} />
@@ -78,6 +89,36 @@ export default function MainScreen() {
           </TouchableOpacity>
         </View>
       </View>
+
+      <View style={{ marginTop: 40, marginBottom: 20 }}>
+        <Text style={{ fontSize: 20, fontWeight: "bold", color: COLORS.secondary }}>
+          Topluluk Tarifleri
+        </Text>
+      </View>
+    </View>
+  );
+
+  return (
+    <View style={styles.container}>
+      <FlatList
+        data={AllSharedRecipes}
+        keyExtractor={(item) => item._id}
+        renderItem={({ item }) => (
+          <LinkCommunityRecipeCard
+            item={item}
+            onPress={(recipe) => setSelectedRecipe(recipe)}
+          />
+        )}
+        ListHeaderComponent={renderHeader}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 40 }}
+      />
+
+      <RecipeDetailModal
+        visible={!!selectedRecipe}
+        recipe={selectedRecipe}
+        onClose={() => setSelectedRecipe(null)}
+      />
     </View>
   );
 }

@@ -20,15 +20,16 @@ export const styles = StyleSheet.create({
   },
   mainContainer: {
     flex: 1,
+    marginTop: 20,
     alignItems: "center",
     justifyContent: "center",
   },
   profilePicture: {
-    width: 150,
-    height: 150,
+    width: 100,
+    height: 100,
     resizeMode: "contain",
     borderRadius: 125,
-    marginBottom: 40,
+    marginBottom: 30,
   },
   helloTextContainer: {
     alignItems: "center",

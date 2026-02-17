@@ -1,3 +1,4 @@
+import RecipeDetailModal from "@/components/RecipeDetailModal";
 import { COLORS } from "@/constants/theme";
 import useFavorites from "@/hooks/useFavorites";
 import { Recipe } from "@/types/recipe";
@@ -5,7 +6,6 @@ import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
   FlatList,
-  Modal,
   ScrollView,
   StyleSheet,
   Text,
@@ -105,84 +105,11 @@ export default function RecipeListScreen({
         <View style={{ height: 40 }} />
       </ScrollView>
 
-      {/* Recipe Detail Modal */}
-      <Modal
+      <RecipeDetailModal
         visible={!!selectedRecipe}
-        animationType="slide"
-        presentationStyle="pageSheet"
-        onRequestClose={() => setSelectedRecipe(null)}
-      >
-        {selectedRecipe && (
-          <View style={styles.modalContainer}>
-            <ScrollView contentContainerStyle={styles.modalContent}>
-              <View style={styles.modalHeader}>
-                <TouchableOpacity
-                  onPress={() => setSelectedRecipe(null)}
-                  style={styles.modalCloseButton}
-                >
-                  <Ionicons name="close" size={24} color={COLORS.secondary} />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.favoriteButton}
-                  onPress={() => selectedRecipe && toggleFavorite(selectedRecipe)}
-                >
-                  <Ionicons
-                    name={
-                      selectedRecipe && isFavorite(selectedRecipe.id)
-                        ? "heart"
-                        : "heart-outline"
-                    }
-                    size={24}
-                    color={COLORS.primary}
-                  />
-                </TouchableOpacity>
-              </View>
-
-              <Text style={styles.modalCategory}>{selectedRecipe.category}</Text>
-              <Text style={styles.modalTitle}>{selectedRecipe.title}</Text>
-              
-              <View style={styles.modalMetaRow}>
-                <View style={styles.modalMetaItem}>
-                  <Ionicons name="time" size={20} color={COLORS.primary} />
-                  <Text style={styles.modalMetaText}>{selectedRecipe.prepTime}</Text>
-                </View>
-                <View style={styles.modalMetaItem}>
-                  <Ionicons name="flame" size={20} color={COLORS.primary} />
-                  <Text style={styles.modalMetaText}>{selectedRecipe.calories}</Text>
-                </View>
-              </View>
-
-              <Text style={styles.modalDescription}>
-                {selectedRecipe.description}
-              </Text>
-
-              <View style={styles.modalSection}>
-                <Text style={styles.modalSectionTitle}>Malzemeler</Text>
-                {selectedRecipe.ingredients.map((ing, idx) => (
-                  <View key={idx} style={styles.instructionRow}>
-                    <View style={styles.bulletPoint} />
-                    <Text style={styles.instructionText}>{ing}</Text>
-                  </View>
-                ))}
-              </View>
-
-              <View style={styles.modalSection}>
-                <Text style={styles.modalSectionTitle}>Hazırlanışı</Text>
-                {selectedRecipe.instructions.map((inst, idx) => (
-                  <View key={idx} style={styles.instructionRow}>
-                    <Text style={styles.instructionIndex}>{idx + 1}.</Text>
-                    <Text style={styles.instructionText}>{inst}</Text>
-                  </View>
-                ))}
-              </View>
-              
-              <View style={{ height: 40 }} />
-            </ScrollView>
-            
-            {/* Fixed Bottom Action if needed */}
-          </View>
-        )}
-      </Modal>
+        recipe={selectedRecipe}
+        onClose={() => setSelectedRecipe(null)}
+      />
     </View>
   );
 }
@@ -297,98 +224,5 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: COLORS.primary,
   },
-  // Modal Styles
-  modalContainer: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  modalContent: {
-    padding: 24,
-  },
-  modalHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  modalCloseButton: {
-    padding: 8,
-    backgroundColor: COLORS.light,
-    borderRadius: 20,
-  },
-  favoriteButton: {
-    padding: 8,
-    backgroundColor: COLORS.light,
-    borderRadius: 20,
-  },
-  modalCategory: {
-    fontSize: 14,
-    fontWeight: "bold",
-    color: COLORS.primary,
-    textTransform: "uppercase",
-    marginBottom: 8,
-  },
-  modalTitle: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: COLORS.secondary,
-    marginBottom: 16,
-  },
-  modalMetaRow: {
-    flexDirection: "row",
-    marginBottom: 24,
-    gap: 20,
-  },
-  modalMetaItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-  modalMetaText: {
-    fontSize: 16,
-    color: COLORS.darkgray,
-    fontWeight: "500",
-  },
-  modalDescription: {
-    fontSize: 16,
-    color: COLORS.darkgray,
-    lineHeight: 24,
-    marginBottom: 32,
-    fontStyle: "italic",
-  },
-  modalSection: {
-    marginBottom: 32,
-  },
-  modalSectionTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: COLORS.secondary,
-    marginBottom: 16,
-  },
-  instructionRow: {
-    flexDirection: "row",
-    marginBottom: 12,
-    alignItems: "flex-start",
-  },
-  bulletPoint: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: COLORS.primary,
-    marginTop: 8,
-    marginRight: 12,
-  },
-  instructionIndex: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: COLORS.primary,
-    width: 24,
-    marginRight: 8,
-  },
-  instructionText: {
-    fontSize: 16,
-    color: COLORS.secondary,
-    lineHeight: 24,
-    flex: 1,
-  },
 });
+
