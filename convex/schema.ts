@@ -10,4 +10,11 @@ export default defineSchema({
   })
     .index("by_user", ["userId"])
     .index("by_user_recipe", ["userId", "recipeId"]),
+  public_recipes: defineTable({
+    userId: v.string(),
+    recipeId: v.number(),
+    recipeTitle: v.string(),
+    recipeData: v.string(),
+  })
+    .index("by_recipe", ["recipeId"]),
 });
