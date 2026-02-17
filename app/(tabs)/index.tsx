@@ -11,9 +11,16 @@ import useRecipeAnalyzer from "../../hooks/useRecipeAnalyzer";
 export default function Index() {
   // call hooks
 
-  const { isCameraOpen, cameraRef, closeCamera } = useCameraSystem();
-  const { recipes, detectedIngredients, loading, takePicture, resetRecipes } =
-    useRecipeAnalyzer();
+  const { isCameraOpen, cameraRef, closeCamera, handleCameraPermission } =
+    useCameraSystem();
+  const {
+    recipes,
+    detectedIngredients,
+    loading,
+    takePicture,
+    resetRecipes,
+    pickImage,
+  } = useRecipeAnalyzer();
 
   const handleCapture = () => {
     takePicture(cameraRef, () => closeCamera()); // close camera after taking picture
@@ -104,5 +111,11 @@ export default function Index() {
   }
 
   // MAIN SCREEN
-  return <MainScreen />;
+  return (
+    <MainScreen
+      onOpenCamera={handleCameraPermission}
+      onPickImage={pickImage}
+      loading={loading}
+    />
+  );
 }

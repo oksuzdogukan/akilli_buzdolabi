@@ -32,5 +32,5 @@ export default function usePublicRecipes() {
     }
   };
 
-  return { toggleShare, isAlreadyShared };
+  return { AllSharedRecipes, toggleShare, isAlreadyShared };
 }
