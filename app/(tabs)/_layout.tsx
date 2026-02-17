@@ -15,7 +15,6 @@ export default function TabLayout() {
           position: "absolute",
           bottom: 0,
           borderColor: COLORS.lightgray,
-          borderTopWidth: 1,
           elevation: 0,
           marginHorizontal: 0,
           paddingHorizontal: 0,

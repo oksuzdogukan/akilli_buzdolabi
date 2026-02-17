@@ -15,7 +15,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Favorites() {
-  const { favorites, toggleFavorite, isFavorite } = useFavorites();
+  const { favorites, toggleFavorite } = useFavorites();
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
 
   const renderRecipeItem = ({ item }: { item: any }) => {
@@ -59,6 +59,7 @@ export default function Favorites() {
         <Text style={styles.headerTitle}>Favori Tariflerim</Text>
       </View>
 
+      {/* favori tarif yoksa */}
       {favorites.length === 0 ? (
         <View style={styles.emptyContainer}>
           <Ionicons
@@ -73,6 +74,7 @@ export default function Favorites() {
           </Text>
         </View>
       ) : (
+        // favori tarif varsa
         <FlatList
           data={favorites}
           renderItem={renderRecipeItem}
@@ -102,7 +104,7 @@ export default function Favorites() {
                   style={styles.favoriteButton}
                   onPress={() => {
                     toggleFavorite(selectedRecipe);
-                    setSelectedRecipe(null); // Close modal on remove? Optional.
+                    setSelectedRecipe(null);
                   }}
                 >
                   <Ionicons name="heart" size={24} color={COLORS.primary} />
