@@ -1,28 +1,31 @@
 import RecipeDetailModal from "@/components/RecipeDetailModal";
+import RecipeSkeletonCard from "@/components/RecipeSkeletonCard";
 import { COLORS } from "@/constants/theme";
 import useFavorites from "@/hooks/useFavorites";
 import { Recipe } from "@/types/recipe";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
-  FlatList,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    FlatList,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 interface RecipeListScreenProps {
   recipes: Recipe[];
   detectedIngredients: string[];
   onReset: () => void;
+  loading?: boolean;
 }
 
 export default function RecipeListScreen({
   recipes,
   detectedIngredients,
   onReset,
+  loading,
 }: RecipeListScreenProps) {
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const { toggleFavorite, isFavorite } = useFavorites();
@@ -78,29 +81,41 @@ export default function RecipeListScreen({
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Detected Ingredients Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Tespit Edilen Malzemeler</Text>
-          <FlatList
-            data={detectedIngredients}
-            renderItem={renderIngredient}
-            keyExtractor={(item, index) => index.toString()}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.ingredientsList}
-          />
-        </View>
+        {loading ? (
+          /* Skeleton Loading */
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Tarifler hazırlanıyor...</Text>
+            <RecipeSkeletonCard />
+            <RecipeSkeletonCard />
+            <RecipeSkeletonCard />
+          </View>
+        ) : (
+          <>
+            {/* Detected Ingredients Section */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Tespit Edilen Malzemeler</Text>
+              <FlatList
+                data={detectedIngredients}
+                renderItem={renderIngredient}
+                keyExtractor={(item, index) => index.toString()}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.ingredientsList}
+              />
+            </View>
 
-        {/* Recipes List */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Sizin İçin Seçtiklerimiz</Text>
-          <FlatList
-            data={recipes}
-            renderItem={renderRecipeItem}
-            keyExtractor={(item) => item.id.toString()}
-            scrollEnabled={false} // Since clear parent creates scroll
-          />
-        </View>
+            {/* Recipes List */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Sizin İçin Seçtiklerimiz</Text>
+              <FlatList
+                data={recipes}
+                renderItem={renderRecipeItem}
+                keyExtractor={(item) => item.id.toString()}
+                scrollEnabled={false}
+              />
+            </View>
+          </>
+        )}
         
         <View style={{ height: 40 }} />
       </ScrollView>

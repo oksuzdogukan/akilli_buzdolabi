@@ -8,7 +8,6 @@ import { useUser } from "@clerk/clerk-expo";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
-  ActivityIndicator,
   FlatList,
   Image,
   Text,
@@ -19,13 +18,11 @@ import {
 interface MainScreenProps {
   onOpenCamera: () => void;
   onPickImage: () => void;
-  loading: boolean;
 }
 
 export default function MainScreen({
   onOpenCamera,
   onPickImage,
-  loading,
 }: MainScreenProps) {
   const { user } = useUser();
   const { AllSharedRecipes } = usePublicRecipes();
@@ -63,26 +60,18 @@ export default function MainScreen({
         {/* BUTTONS SECTION */}
         <View style={styles.buttonsSection}>
           <TouchableOpacity
-            style={[styles.actionButtonMain, loading && { opacity: 0.7 }]}
+            style={styles.actionButtonMain}
             onPress={onOpenCamera}
-            disabled={loading}
           >
-            {loading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <>
-                <Ionicons name="camera" size={24} color="white" />
-                <Text style={styles.actionButtonMainText}>
-                  Buzdolabını Tara
-                </Text>
-              </>
-            )}
+            <Ionicons name="camera" size={24} color="white" />
+            <Text style={styles.actionButtonMainText}>
+              Buzdolabını Tara
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.actionButtonSecondary, loading && { opacity: 0.7 }]}
+            style={styles.actionButtonSecondary}
             onPress={onPickImage}
-            disabled={loading}
           >
             <Ionicons name="images" size={24} color={COLORS.primary} />
             <Text style={styles.actionButtonSecondaryText}>Galeriden Seç</Text>

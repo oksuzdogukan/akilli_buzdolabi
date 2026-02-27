@@ -1,5 +1,5 @@
 import React from "react";
-import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 // Hooks
 import MainScreen from "@/pages/MainScreen";
 import RecipeListScreen from "@/pages/RecipeListScreen";
@@ -23,7 +23,8 @@ export default function Index() {
   } = useRecipeAnalyzer();
 
   const handleCapture = () => {
-    takePicture(cameraRef, () => closeCamera()); // close camera after taking picture
+    closeCamera(); // kamerayı hemen kapat, skeleton ekranı gösterilecek
+    takePicture(cameraRef);
   };
 
   // const handleNewScan = () => {
@@ -54,58 +55,43 @@ export default function Index() {
               alignItems: "center",
             }}
           >
-            {loading ? (
+            <TouchableOpacity onPress={handleCapture}>
+              {/* Deklansör Görünümü */}
               <View
                 style={{
-                  backgroundColor: "rgba(0,0,0,0.7)",
-                  padding: 20,
-                  borderRadius: 10,
+                  width: 80,
+                  height: 80,
+                  borderRadius: 40,
+                  backgroundColor: "white",
                   alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
-                <ActivityIndicator size="large" color="#fff" />
-                <Text style={{ color: "white", marginTop: 10 }}>
-                  Mutfak Analiz Ediliyor...
-                </Text>
-              </View>
-            ) : (
-              <TouchableOpacity onPress={handleCapture}>
-                {/* Deklanşör Görünümü */}
                 <View
                   style={{
-                    width: 80,
-                    height: 80,
-                    borderRadius: 40,
-                    backgroundColor: "white",
-                    alignItems: "center",
-                    justifyContent: "center",
+                    width: 70,
+                    height: 70,
+                    borderRadius: 35,
+                    borderWidth: 2,
+                    borderColor: "#000",
                   }}
-                >
-                  <View
-                    style={{
-                      width: 70,
-                      height: 70,
-                      borderRadius: 35,
-                      borderWidth: 2,
-                      borderColor: "#000",
-                    }}
-                  />
-                </View>
-              </TouchableOpacity>
-            )}
+                />
+              </View>
+            </TouchableOpacity>
           </View>
         </CameraView>
       </View>
     );
   }
 
-  // Recipes Page
-  if (recipes) {
+  // Recipes Page veya Loading (skeleton)
+  if (recipes || loading) {
     return (
       <RecipeListScreen
-        recipes={recipes}
+        recipes={recipes || []}
         detectedIngredients={detectedIngredients || []}
         onReset={resetRecipes}
+        loading={loading}
       />
     );
   }
@@ -115,7 +101,6 @@ export default function Index() {
     <MainScreen
       onOpenCamera={handleCameraPermission}
       onPickImage={pickImage}
-      loading={loading}
     />
   );
 }
