@@ -13,7 +13,7 @@ export default function useRecipeAnalyzer() {
     string[] | null
   >(null);
   const [loading, setLoading] = useState(false);
-  const analyzeImage = useAction(api.gemini.analyzeImage); // gemini function from convex
+  const analyzeImage = useAction(api.groq.analyzeImageGroq); // groqAPI function from convex
 
   const processImageUri = async (uri: string, onSuccess?: () => void) => {
     try {
@@ -23,7 +23,7 @@ export default function useRecipeAnalyzer() {
       const optimiziedPicture = await manipulateAsync(
         uri,
         [{ resize: { width: 800 } }],
-        { compress: 0.6, format: SaveFormat.JPEG, base64: true }
+        { compress: 0.6, format: SaveFormat.JPEG, base64: true },
       );
 
       // convex action, ask AI
@@ -32,8 +32,15 @@ export default function useRecipeAnalyzer() {
           imageBase64: optimiziedPicture.base64,
         })) as unknown as { detectedIngredients: string[]; recipes: Recipe[] };
 
+        // AI her seferinde id: 1, 2, 3 üretiyor — çakışmaları önlemek için benzersiz ID ata
+        const timestamp = Date.now();
+        const recipesWithUniqueIds = result.recipes.map((recipe, index) => ({
+          ...recipe,
+          id: timestamp + index,
+        }));
+
         // show results
-        setRecipes(result.recipes);
+        setRecipes(recipesWithUniqueIds);
         setDetectedIngredients(result.detectedIngredients);
 
         // trigger success callback if provided
@@ -52,7 +59,7 @@ export default function useRecipeAnalyzer() {
 
   const takePicture = async (
     cameraRef: RefObject<CameraView | null>,
-    onSuccess?: () => void
+    onSuccess?: () => void,
   ) => {
     if (!cameraRef.current) return;
 
