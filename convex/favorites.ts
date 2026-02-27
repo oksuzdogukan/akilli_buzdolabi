@@ -19,7 +19,7 @@ export const addFavorite = mutation({
     const existing = await ctx.db
       .query("favorites")
       .withIndex("by_user_recipe", (q) =>
-        q.eq("userId", userId).eq("recipeId", args.recipeId)
+        q.eq("userId", userId).eq("recipeId", args.recipeId),
       )
       .first();
 
@@ -53,7 +53,7 @@ export const removeFavorite = mutation({
     const existing = await ctx.db
       .query("favorites")
       .withIndex("by_user_recipe", (q) =>
-        q.eq("userId", userId).eq("recipeId", args.recipeId)
+        q.eq("userId", userId).eq("recipeId", args.recipeId),
       )
       .first();
 

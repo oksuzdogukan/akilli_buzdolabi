@@ -10,6 +10,8 @@
 
 import type * as favorites from "../favorites.js";
 import type * as gemini from "../gemini.js";
+import type * as groq from "../groq.js";
+import type * as recipes from "../recipes.js";
 
 import type {
   ApiFromModules,
@@ -20,6 +22,8 @@ import type {
 declare const fullApi: ApiFromModules<{
   favorites: typeof favorites;
   gemini: typeof gemini;
+  groq: typeof groq;
+  recipes: typeof recipes;
 }>;
 
 /**
